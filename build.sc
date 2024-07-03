@@ -61,7 +61,7 @@ def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
   T.command {
     val timeout     = 10.minutes
     val credentials = sys.env("SONATYPE_USERNAME") + ":" + sys.env("SONATYPE_PASSWORD")
-    val pgpPassword = sys.env("PGP_PASSWORD")
+    val pgpPassword = sys.env("PGP_PASSPHRASE")
     val data        = define.Task.sequence(tasks.value)()
 
     doPublishSonatype(
@@ -125,10 +125,10 @@ trait LibDaemonPublish extends PublishModule {
   import mill.scalalib.publish._
   def pomSettings = PomSettings(
     description = artifactName(),
-    organization = "io.github.alexarchambault.libdaemon",
-    url = s"https://github.com/alexarchambault/libdaemon-jvm",
+    organization = "ch.epfl.scala",
+    url = s"https://github.com/scalacenter/libdaemon-jvm",
     licenses = Seq(License.`Apache-2.0`),
-    versionControl = VersionControl.github("alexarchambault", "libdaemon-jvm"),
+    versionControl = VersionControl.github("scalacenter", "libdaemon-jvm"),
     developers = Seq(
       Developer("alexarchambault", "Alex Archambault", "https://github.com/alexarchambault")
     )
