@@ -7,12 +7,12 @@ import mill.scalalib._
 
 import scala.concurrent.duration.{Duration, DurationInt}
 
-def scala3        = "3.1.0"
-def scala213      = "2.13.7"
-def scala212      = "2.12.15"
+def scala3        = "3.3.3"
+def scala213      = "2.13.14"
+def scala212      = "2.12.20"
 def scalaVersions = Seq(scala3, scala213, scala212)
 
-object library extends Cross[Library](scalaVersions: _*)
+object library extends Cross[Library](scalaVersions)
 
 def tmpDirBase =
   if (System.getenv("CI") == null)
@@ -24,15 +24,15 @@ def tmpDirBase =
       PathRef(os.home / ".test-data")
     }
 
-class Library(val crossScalaVersion: String) extends CrossScalaModule with LibDaemonPublish {
+trait Library extends CrossScalaModule with LibDaemonPublish {
   def artifactName = "libdaemon"
   def javacOptions = super.javacOptions() ++ Seq(
     "--release",
     "16"
   )
-  object test extends Tests {
+  object test extends ScalaTests {
     def ivyDeps = super.ivyDeps() ++ Seq(
-      ivy"org.scalameta::munit:0.7.29",
+      ivy"org.scalameta::munit:1.0.1",
       ivy"com.eed3si9n.expecty::expecty:0.15.4",
       ivy"com.lihaoyi::os-lib:0.7.8"
     )
@@ -59,7 +59,7 @@ def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
     val timeout     = 10.minutes
     val credentials = sys.env("SONATYPE_USERNAME") + ":" + sys.env("SONATYPE_PASSWORD")
     val pgpPassword = sys.env("PGP_PASSPHRASE")
-    val data        = define.Task.sequence(tasks.value)()
+    val data        = T.sequence(tasks.value)()
 
     doPublishSonatype(
       credentials = credentials,
